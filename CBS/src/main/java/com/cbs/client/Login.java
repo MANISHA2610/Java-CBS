@@ -11,17 +11,16 @@ public class Login {
 		System.out.println("Press 1 to login as admin");
 		System.out.println("Press 2 to login as manager");
 		System.out.println("Press 3 to login as employee");	
+		Login l = new Login();
+		l.FirstLogic();
 	}
 	
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+	public void FirstLogic(){
 		
-		Login l = new Login();
 		AdminCl admin = new AdminCl();
 		ManagerCl manager = new ManagerCl();
 		EmployeeCl employee = new EmployeeCl();
 		Scanner sc = new Scanner(System.in);
-		
-		l.strt();
 		int i = sc.nextInt();
 		switch(i) {
 		case 1:
@@ -33,10 +32,13 @@ public class Login {
 		case 3:
 			employee.EmployeeLogin();
 			break;
-		default:
-			l.strt();
 		}
-		sc.close();
 
+	}
+	public static void main(String[] args){
+		
+		Login l = new Login();
+		l.strt();
+		l.FirstLogic();
 	}
 }

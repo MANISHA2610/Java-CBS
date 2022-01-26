@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import com.cbs.client.AdminCl;
 import com.cbs.client.Login;
 import com.cbs.model.Employee;
 import com.cbs.model.CabModel;
 import com.cbs.dao.CabDaoImpl;
-//import com.cbs.services.EmployeeImpl;
 
 public class AdminImpl implements CabService{
 	Login l = new Login();
@@ -20,19 +20,16 @@ public class AdminImpl implements CabService{
 	CabModel cm = new CabModel();
 	EmployeeImpl emImp = new EmployeeImpl();
 	
-	
 	public void login() {
 		cdi.getCon();
 		System.out.println("Enter your name");
 		log.setName(sc.nextLine());
 		System.out.println("Enter your password");
 		log.setPassword(sc.nextLine());
-		System.out.println("Enter your EId");
-		log.setEmpId(sc.nextInt());
 		try {
-			String query = "select name,pass from employee where EId=?;";
+			String query = "select name,pass from employee where name=?;";
 			PreparedStatement pst = cdi.getCon().prepareStatement(query);
-			pst.setInt(1, log.getEmpId());
+			pst.setString(1, log.getName());
 			ResultSet rs = pst.executeQuery();
 			while(rs.next()) {
 				if(rs.getString(1).contentEquals(log.getName()) && rs.getString(2).contentEquals(log.getPassword())){
@@ -49,7 +46,6 @@ public class AdminImpl implements CabService{
 	}
 	
 	public void addCab(){
-		
 		try {
 			cdi.getCon();
 			String query = "insert into cab(cabId, cabNo, stat, Stime, Etime)"+ " values(?,?,?,?,?)";
@@ -94,9 +90,12 @@ public class AdminImpl implements CabService{
 
 			e.printStackTrace();
 		}
+		AdminCl adcl = new AdminCl();
+		adcl.AdminStart();
 	}
 	
 	public void delCab() {
+		AdminCl adcl = new AdminCl();
 		try {
 			cdi.getCon();
 			String query = "delete from cab where cabId= ?";
@@ -112,10 +111,13 @@ public class AdminImpl implements CabService{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		adcl.AdminStart();
 	}
+	
 	@SuppressWarnings("unchecked")
+	
 	public void viewCabs() {
-		
+		AdminCl adcl = new AdminCl();
 		@SuppressWarnings("rawtypes")
 		ArrayList list = new ArrayList<Comparable>();
 		try {
@@ -141,13 +143,11 @@ public class AdminImpl implements CabService{
 			
 			e.printStackTrace();
 		}
-		finally {
-			sc.close();
-	}
+		adcl.AdminStart();
 	}	
 		
 	public void addEmpl() {
-		
+		AdminCl adcl = new AdminCl();
 		try {
 			cdi.getCon();
 			String query = "insert into employee(Eid, name, email, pass, manager, department)"+ " values(?,?,?,?,?,?)";
@@ -203,9 +203,12 @@ public class AdminImpl implements CabService{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-	public void delEmpl() {
 		
+		adcl.AdminStart();
+	}
+	
+	public void delEmpl() {
+		AdminCl adcl = new AdminCl();
 		try {
 			cdi.getCon();
 			String query = "delete from employee where EId= ?";
@@ -225,10 +228,12 @@ public class AdminImpl implements CabService{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		adcl.AdminStart();
 	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void viewEmp() {
-		
+		AdminCl adcl = new AdminCl();
 		ArrayList list = new ArrayList();
 		try {
 			cdi.getCon();
@@ -252,53 +257,64 @@ public class AdminImpl implements CabService{
 			
 			e.printStackTrace();
 		}
-		finally {
-			sc.close();
+		adcl.AdminStart();
 	}
-		
-	}
+	
 	public void logout() {
 		System.out.println("Logged out successfully!!");
 		l.strt();
 	}
 	
 	public void viewReq() {
-		try {
-			emImp.checkBookHis();
-			if(emImp.checkBookHis().getString("password").contentEquals("Approved")) {
-				sendCabDet();
+		ArrayList<Comparable> list = new ArrayList<Comparable>();
+		try{
+			cdi.getCon();
+			java.sql.Statement st = cdi.getCon().createStatement();
+			String query = "select * from requests;";
+			ResultSet rs = ((java.sql.Statement) st).executeQuery(query);
+			while(rs.next()) {
+				list.add(rs.getInt("reqId"));
+				list.add(rs.getInt("EId"));
+				list.add(rs.getString("status"));
 			}
-		} catch (SQLException e) {
-			
+			System.out.println(list);
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
 		}
+		AdminCl adcl = new AdminCl();
+		adcl.AdminStart();
 	}
 
-	public void sendCabDet() {
-		ManagerImpl manImp = new ManagerImpl();
-		if(manImp.z == 1) {
-			ArrayList list = new ArrayList<Comparable>();
-			try {
-				cdi.getCon();
-				String query = "select * from cab where status ='1';";
-				java.sql.Statement st = cdi.getCon().createStatement();
-			//	PreparedStatement pst = cdi.getCon().prepareStatement(query);
-				ResultSet rs = ((java.sql.Statement) st).executeQuery(query);
-				while(rs.next())
-			      {
-			        list.add(rs.getInt("cabId"));
-			        list.add(rs.getInt("cabNo"));
-			        list.add(rs.getTime("Stime").toString());
-			        list.add(rs.getTime("Etime").toString());
-			      }
-				System.out.println("Here are the following cab details");
-				System.out.println(list);
-			}
+	public void sendCabDet() {	
+		try {
+			cdi.getCon();
+			String query = "insert into BookingHistory (cabNo, Stime, Etime) select cabNo, Stime, Etime from cab where stat=0;";
+			PreparedStatement pst = cdi.getCon().prepareStatement(query);
+			pst.execute();	
+			String query1 = "update BookingHistory set  reqId = ? , EId = ? where cabNo=?;";
+			PreparedStatement pst1 = cdi.getCon().prepareStatement(query1);
 			
-			catch (SQLException e) {
-				
-				e.printStackTrace();
-			}
+			System.out.println("Enter approved request Id: ");
+			int reqId = sc.nextInt();
+			pst1.setInt(1, reqId);
+			
+			System.out.println("Enter employee Id: ");
+			int EId = sc.nextInt();
+			pst1.setInt(2, EId);
+			
+			System.out.println("Enter cab no: ");
+			int cabNo = sc.nextInt();
+			pst1.setInt(3, cabNo);
+			
+			pst1.execute();
+			System.out.println("Details sent to the user");
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
 		}
+		AdminCl adcl = new AdminCl();
+		adcl.AdminStart();
 	}
 }

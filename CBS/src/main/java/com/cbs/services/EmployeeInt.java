@@ -1,10 +1,13 @@
 package com.cbs.services;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 
 public interface EmployeeInt {
 	
+	public void login();
 	public void raiseReq();
-	public ResultSet checkBookHis();
+	public ResultSet checkPrevStatus();
+	public void viewCabs();
+	public void checkBookHis();
+	public void logout();
 }
