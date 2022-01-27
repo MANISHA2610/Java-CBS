@@ -1,7 +1,5 @@
 package com.cbs.model;
 
-import java.sql.Time;
-
 public class CabModel {
 
 	Integer cabId, cabNo;

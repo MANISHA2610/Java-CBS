@@ -1,7 +1,5 @@
 package com.cbs.services;
 
-import com.cbs.model.Employee;
-
 public interface CabService {
 	public void login();
 	public void addCab();

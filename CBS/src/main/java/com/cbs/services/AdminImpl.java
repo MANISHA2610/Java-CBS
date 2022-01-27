@@ -21,6 +21,7 @@ public class AdminImpl implements CabService{
 	EmployeeImpl emImp = new EmployeeImpl();
 	
 	public void login() {
+		AdminImpl ad = new AdminImpl();
 		cdi.getCon();
 		System.out.println("Enter your name");
 		log.setName(sc.nextLine());
@@ -37,6 +38,7 @@ public class AdminImpl implements CabService{
 				}
 				else{
 					System.out.println("You have entered wrong credentials.");
+					ad.login();
 				}	
 			}
 			
@@ -99,7 +101,6 @@ public class AdminImpl implements CabService{
 		try {
 			cdi.getCon();
 			String query = "delete from cab where cabId= ?";
-			//	java.sql.Statement st = cdi.getCon().createStatement();
 			PreparedStatement pst = cdi.getCon().prepareStatement(query);
 			System.out.println("Enter the Cab Id to delete: ");
 			int i =sc.nextInt();
@@ -135,7 +136,12 @@ public class AdminImpl implements CabService{
 		        list.add(rs.getTime("Etime").toString());
 		      }
 			System.out.println("Here are the following cab details");
-			System.out.println(list);
+			for(int i=0; i<list.size();i++) {
+				if(list.get(i).equals("")){
+					System.out.println("\n");	
+			}
+				System.out.println(list.get(i));
+	}
 			
 		}
 		
@@ -172,7 +178,7 @@ public class AdminImpl implements CabService{
 			log.setEmail(sc.nextLine());
 			pst.setString(3, log.getEmail());
 			
-			System.out.println("Enter your password: ");
+			System.out.println("Create new password: ");
 			log.setPassword(sc.nextLine());
 			pst.setString(4, log.getPassword());
 			
@@ -249,9 +255,12 @@ public class AdminImpl implements CabService{
 		        list.add(rs.getString("department"));
 		      }
 			System.out.println("Here are the following cab details");
-			System.out.println(list);
-			
-			
+			for(int i=0; i<list.size();i++) {
+				if(list.get(i).equals("")){
+					System.out.println("\n");	
+			}
+				System.out.println(list.get(i));
+	}	
 		}
 		catch (SQLException e) {
 			
@@ -271,7 +280,7 @@ public class AdminImpl implements CabService{
 			cdi.getCon();
 			java.sql.Statement st = cdi.getCon().createStatement();
 			String query = "select * from requests;";
-			ResultSet rs = ((java.sql.Statement) st).executeQuery(query);
+			ResultSet rs = st.executeQuery(query);
 			while(rs.next()) {
 				list.add(rs.getInt("reqId"));
 				list.add(rs.getInt("EId"));

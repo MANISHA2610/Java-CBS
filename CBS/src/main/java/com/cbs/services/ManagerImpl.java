@@ -15,11 +15,12 @@ public class ManagerImpl implements ManagerInt{
 	
 	CabDaoImpl cdi = new CabDaoImpl();
 	Employee log = new Employee();
+	Scanner sc = new Scanner(System.in);
 	public int z = 0;
 	
 	public void login() {
+		ManagerImpl manImp = new ManagerImpl();	
 		cdi.getCon();
-		Scanner sc = new Scanner(System.in);
 		System.out.println("Enter your name");
 		log.setName(sc.nextLine());
 		System.out.println("Enter your password");
@@ -35,16 +36,20 @@ public class ManagerImpl implements ManagerInt{
 				}
 				else{
 					System.out.println("You have entered wrong credentials.");
+					manImp.login();	
 				}	
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		ManagerCl manCl = new ManagerCl();
+		manCl.ManagerLogin();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void viewEmp() {
-		ManagerCl ms = new ManagerCl();
+		@SuppressWarnings("rawtypes")
 		ArrayList list = new ArrayList();
 		try {
 			cdi.getCon();
@@ -60,18 +65,23 @@ public class ManagerImpl implements ManagerInt{
 		        list.add(rs.getString("department"));
 		      }
 			System.out.println("Here are the following cab details");
-			System.out.println(list);	
+			for(int i=0; i<list.size();i++) {
+				if(list.get(i).equals("")){
+					System.out.println("\n");	
+			}
+				System.out.println(list.get(i));
+	}
 		}
 		catch (SQLException e) {
 			
 			e.printStackTrace();
 		}
-		
+		ManagerCl manCl = new ManagerCl();
+		manCl.ManagerLogin();
 	}
 
 	public void acceptReq() {
-		ManagerImpl manImpl = new ManagerImpl();
-		try(Scanner sc = new Scanner(System.in)) {
+		try{
 			cdi.getCon();
 			System.out.println("Enter the cab request Id to be Approved: ");
 			int rId = sc.nextInt();
@@ -84,6 +94,7 @@ public class ManagerImpl implements ManagerInt{
 			pst1.setInt(1, rId);
 			pst.execute();
 			ResultSet rs = pst1.executeQuery();
+			@SuppressWarnings("unused")
 			int EId = 0;
 			while(rs.next()) {
 				EId = rs.getInt("EId");
@@ -94,16 +105,16 @@ public class ManagerImpl implements ManagerInt{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+		ManagerCl manCl = new ManagerCl();
+		manCl.ManagerLogin();
 	}
 	
 	public void rejectReq() {
-		try(Scanner sc = new Scanner(System.in)) {
+		try{
 			cdi.getCon();
 			System.out.println("Enter the cab request Id to be Rejected: ");
 			int rId = sc.nextInt();
 			String query = "update requests set status = 'Rejected' where reqId =?;";
-		//	java.sql.Statement st = cdi.getCon().createStatement();
 			PreparedStatement pst = cdi.getCon().prepareStatement(query);
 			pst.setInt(1, rId);
 			pst.execute();
@@ -113,15 +124,17 @@ public class ManagerImpl implements ManagerInt{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		ManagerCl manCl = new ManagerCl();
+		manCl.ManagerLogin();
 	}
 	
 	public void viewAllReq() {
-		ArrayList list = new ArrayList();
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		ArrayList<Comparable> list = new ArrayList();
 		try {
 			cdi.getCon();
 			String query = "select * from requests;";
 			java.sql.Statement st = cdi.getCon().createStatement();
-		//	PreparedStatement pst = cdi.getCon().prepareStatement(query);
 			ResultSet rs = ((java.sql.Statement) st).executeQuery(query);
 			while(rs.next())
 		      {
@@ -130,7 +143,12 @@ public class ManagerImpl implements ManagerInt{
 		        list.add(rs.getString("status"));
 		      }
 			System.out.println("Here are the following cab details");
-			System.out.println(list);
+			for(int i=0; i<list.size();i++) {
+				if(list.get(i).equals("")){
+					System.out.println("\n");	
+			}
+				System.out.println(list.get(i));
+	}
 			
 		}
 		catch (SQLException e) {
@@ -139,7 +157,7 @@ public class ManagerImpl implements ManagerInt{
 		}
 		
 		ManagerImpl manImp = new ManagerImpl();	
-		try(Scanner sc = new Scanner(System.in)){
+		try{
 			System.out.println("Press 'a' to approve requests.");
 			System.out.println("Press 'r' to reject requests.");
 			String a = sc.nextLine();
@@ -153,6 +171,8 @@ public class ManagerImpl implements ManagerInt{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		ManagerCl manCl = new ManagerCl();
+		manCl.ManagerLogin();
 	}
     
 	public void logout() {

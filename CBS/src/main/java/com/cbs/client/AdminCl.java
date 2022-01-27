@@ -6,10 +6,7 @@ import com.cbs.services.AdminImpl;
 
 public class AdminCl {
 	
-	Login l = new Login();
 	Scanner sc = new Scanner(System.in);
-	
-
 	
 	public void AdminLogin() {
 		AdminImpl ad = new AdminImpl();
