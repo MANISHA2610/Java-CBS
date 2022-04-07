@@ -1,5 +1,6 @@
 # Java-CBS
 
+Project Name : Cab Booking System
 Technologies used: Java, MySQL, JDBC, JUnit, Log4J
 
 A console based project with respective database.
